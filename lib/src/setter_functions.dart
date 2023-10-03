@@ -37,12 +37,7 @@ Future<bool> setFromNetwork({
     storageDirectoryType: _getStorageDirectoryType(action),
   );
   final file = File(path);
-
-  // Firebase files are returned with encoding. Double encoding
-  // will cause an error.
-  final uri = Uri.tryParse(url) ?? Uri.parse(Uri.encodeFull(url));
-
-  final response = await http.get(uri);
+  final response = await http.get(urlParser(url));
   if (response.statusCode == 200) {
     await file.writeAsBytes(response.bodyBytes);
     final mimeType = await _parseMimeType(response);
@@ -58,6 +53,15 @@ Future<bool> setFromNetwork({
       "Network error. Code ${response.statusCode}, ${response.reasonPhrase}",
     );
   }
+}
+
+/// Url parser.
+///
+/// Firebase files are returned with encoding. Double encoding
+/// will cause an error. Therefore, first we try to parse using
+/// the [Uri.tryParse] method.
+Uri urlParser(String url) {
+  return Uri.tryParse(url) ?? Uri.parse(Uri.encodeFull(url));
 }
 
 /// Returns path for storing ringtone/notification/alarm sound.
