@@ -44,5 +44,13 @@ void main() {
       expect(uri.toString(),
           "https://example.com/api/query?search=%20dart%20&%20is");
     });
+
+    test("URL with arabic symbols", () {
+      final url =
+          'https://daroukarim.com/Coran/Basset mujawad/an-Nisāʾ النساء.mp3';
+      final uri = urlParser(url);
+      expect(uri.toString(),
+          "https://daroukarim.com/Coran/Basset%20mujawad/an-Nis%C4%81%CA%BE%20%D8%A7%D9%84%D9%86%D8%B3%D8%A7%D8%A1.mp3");
+    });
   });
 }
