@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
-import 'package:ringtone_set/ringtone_set.dart';
 
 const MethodChannel _channel = const MethodChannel('ringtone_set');
 
@@ -38,7 +37,7 @@ Future<bool> setFromNetwork({
     storageDirectoryType: _getStorageDirectoryType(action),
   );
   final file = File(path);
-  final response = await http.get(Uri.parse(Uri.encodeFull(url)));
+  final response = await http.get(urlParser(url));
   if (response.statusCode == 200) {
     await file.writeAsBytes(response.bodyBytes);
     final mimeType = await _parseMimeType(response);
@@ -54,6 +53,15 @@ Future<bool> setFromNetwork({
       "Network error. Code ${response.statusCode}, ${response.reasonPhrase}",
     );
   }
+}
+
+/// Url parser.
+///
+/// Firebase files are returned with encoding. Double encoding
+/// will cause an error. Therefore, first we try to parse using
+/// the [Uri.tryParse] method.
+Uri urlParser(String url) {
+  return Uri.tryParse(url) ?? Uri.parse(Uri.encodeFull(url));
 }
 
 /// Returns path for storing ringtone/notification/alarm sound.
